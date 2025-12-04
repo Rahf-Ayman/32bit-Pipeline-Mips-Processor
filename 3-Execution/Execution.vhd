@@ -40,12 +40,12 @@ architecture Execution_ARC of Execution is
 	end component ALU_CONTROL;
 	
 	component ALU is 
-		generic (WIDTH:INTEGER := INST_SIZE);
+		generic (INST_SIZE:INTEGER := INST_SIZE);
 		port(
-			operand_A: in STD_LOGIC_VECTOR(WIDTH-1 downto 0);
-			operand_B: in STD_LOGIC_VECTOR(WIDTH-1 downto 0);
+			operand_A: in STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+			operand_B: in STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 			alu_ctrl: in ALU_INPUT;
-			result: out STD_LOGIC_VECTOR(WIDTH-1 downto 0);
+			result: out STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 			FLAGS: out ALU_FLAGS	
 		);
 	end component ALU;
@@ -83,7 +83,7 @@ architecture Execution_ARC of Execution is
 		);
 	end component EX_Reg; 
 	component Mux2to1 is
-		generic (n:integer:=32);
+		generic (n:integer:=INST_SIZE);
 	    port(
 		in0: in std_logic_vector(n-1 downto 0); 
 		in1:in std_logic_vector(n-1 downto 0);
@@ -138,7 +138,7 @@ begin
 	);
 	 
 	ALU_MIPS: 
-		ALU generic map (WIDTH => INST_SIZE)
+		ALU generic map (INST_SIZE => INST_SIZE)
 		port map(
 			operand_A	=> RS,
 			operand_B	=> ALU_REG_IN,

@@ -1,40 +1,42 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
 use work.MIPS_CONST_PKG.all;
 
 entity ALU is 
     generic (
-        WIDTH : integer := 32
+        INST_SIZE : integer := 32
     );
     port(
-        operand_A : in  std_logic_vector(WIDTH-1 downto 0);
-        operand_B : in  std_logic_vector(WIDTH-1 downto 0);
+        operand_A : in  std_logic_vector(INST_SIZE-1 downto 0);
+        operand_B : in  std_logic_vector(INST_SIZE-1 downto 0);
         alu_ctrl  : in  ALU_INPUT;
-        result    : out std_logic_vector(WIDTH-1 downto 0);
+        result    : out std_logic_vector(INST_SIZE-1 downto 0);
 		FLAGS	: out ALU_FLAGS
     );
 end entity ALU;
 
 architecture RTL of ALU is 
     -- Internal signals
-    signal arithmetic_result : std_logic_vector(WIDTH downto 0);
-    signal logic_result    : std_logic_vector(WIDTH-1 downto 0);
-    signal shift_result    : std_logic_vector(WIDTH-1 downto 0);
-    signal compare_result  : std_logic_vector(WIDTH-1 downto 0);
-    signal final_result    : std_logic_vector(WIDTH-1 downto 0);
+    signal arithmetic_result : std_logic_vector(INST_SIZE downto 0);
+    signal logic_result    : std_logic_vector(INST_SIZE-1 downto 0);
+    signal shift_result    : std_logic_vector(INST_SIZE-1 downto 0);
+    signal compare_result  : std_logic_vector(INST_SIZE-1 downto 0);
+    signal final_result    : std_logic_vector(INST_SIZE-1 downto 0);
     
     signal op_code : std_logic_vector(1 downto 0);
     
-    constant ZERO_VECTOR   : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
+    constant ZERO_VECTOR   : std_logic_vector(INST_SIZE-1 downto 0) := (others => '0');
     
 begin
     
     op_code <= alu_ctrl.Op1 & alu_ctrl.Op0;
     
     ARITHMETIC_PROC: process(operand_A, operand_B, alu_ctrl)
-        variable sum_temp   : unsigned(WIDTH downto 0);
-        variable a_temp, b_temp : unsigned(WIDTH downto 0);
+        variable sum_temp   : unsigned(INST_SIZE downto 0);
+        variable a_temp, b_temp : unsigned(INST_SIZE downto 0);
     begin
         a_temp := unsigned('0' & operand_A);
         b_temp := unsigned('0' & operand_B);
@@ -101,9 +103,9 @@ begin
             elsif alu_ctrl.Op2 = '0' and op_code = "11" then   -- NOR
                 final_result <= logic_result;
             elsif alu_ctrl.Op2 = '0' and op_code = "10" then   -- ADD
-                final_result <= arithmetic_result(WIDTH-1 downto 0);
+                final_result <= arithmetic_result(INST_SIZE-1 downto 0);
             elsif alu_ctrl.Op2 = '1' and op_code = "10" then   -- SUB
-                final_result <= arithmetic_result(WIDTH-1 downto 0);
+                final_result <= arithmetic_result(INST_SIZE-1 downto 0);
             elsif alu_ctrl.Op2 = '1' and op_code = "11" then   -- SLT
                 final_result <= compare_result;
             else
@@ -113,7 +115,7 @@ begin
     end process MAIN_MUX_PROC;
     
     result <= final_result;
-    FLAGS.Carry <= arithmetic_result(WIDTH);
+    FLAGS.Carry <= arithmetic_result(INST_SIZE);
     
     FLAGS_PROC: process(final_result, arithmetic_result)
     begin
@@ -126,11 +128,10 @@ begin
 		
 		
         -- Negative Flag
-        FLAGS.Negative  <= final_result(WIDTH-1);
+        FLAGS.Negative  <= final_result(INST_SIZE-1);
 		
-        
         -- Overflow Flag
-        FLAGS.Overflow <= arithmetic_result(WIDTH) xor arithmetic_result(WIDTH-1);
+        FLAGS.Overflow <= arithmetic_result(INST_SIZE) xor arithmetic_result(INST_SIZE-1);
     end process FLAGS_PROC;
     
 end architecture RTL;

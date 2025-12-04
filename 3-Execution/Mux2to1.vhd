@@ -1,9 +1,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+library work;
+use work.MIPS_CONST_PKG.all;
+
 entity Mux2To1 is
 	generic(
-	n:integer:=32
+	n:integer:=INST_SIZE
 	);
 	port(
 	in0:in std_logic_vector(n-1 downto 0); 
