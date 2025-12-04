@@ -80,7 +80,7 @@ architecture struct of Mips_Processor is
 			signal WB_unit_intern1		: WB_CTRL_REG;
 			signal MEM_unit_intern1		: MEM_CTRL_REG;
 			signal EX_unit_intern		: EX_CTRL_REG;
-			
+			--IF/ID
 			signal new_PC_addr_intern1		: STD_LOGIC_vector (INST_SIZE-1 downto 0);
 			signal instruction_intern		: STD_LOGIC_vector (INST_SIZE-1 downto 0);
 		-- end of IF ID s
