@@ -32,8 +32,7 @@ architecture Mem_Con_arc of Mem_Con is
 	
     component Data_Mem is
 	    generic (n :NATURAL; m :NATURAL);
-	    port(
-		   reset		:	in  STD_LOGIC;			
+	    port(		
 		   addr		:	in  STD_LOGIC_VECTOR (n-1 downto 0);
 		   write_data	:	in  STD_LOGIC_VECTOR (n-1 downto 0);
 		   memRead		:	in  STD_LOGIC;			
@@ -75,7 +74,6 @@ begin
 	Data_Memory:
 		Data_Mem generic map (n=>INST_SIZE, m=>NUM_ADDR)
 	 	port map(
-			reset		=> reset,
 			addr		=> addr_in,
 			write_data	=> write_data,
 			memRead		=> mem.MemRead,

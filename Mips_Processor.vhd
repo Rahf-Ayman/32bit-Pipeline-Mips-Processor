@@ -8,7 +8,10 @@ use work.MIPS_CONST_PKG.all;
 entity Mips_Processor is
 	port(
 		CLK 	: in STD_LOGIC;
-		RESET	: in STD_LOGIC
+		RESET	: in STD_LOGIC;
+		
+		INSTR   : out STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+		WRITE_DATA : out STD_LOGIC_VECTOR (INST_SIZE-1 downto 0)
 	);
 end Mips_Processor;
 
@@ -250,5 +253,7 @@ begin
         );
 	
 	--end of EX ME WR
-
+	INSTR <= instruction_intern;
+	
+	WRITE_DATA <= write_data_intern;
 end struct;		
