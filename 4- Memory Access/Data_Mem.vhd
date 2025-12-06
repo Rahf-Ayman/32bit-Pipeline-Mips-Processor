@@ -21,12 +21,20 @@ end Data_Mem;
 architecture Data_Mem_arc of Data_Mem is
   
 	type mem_temp is array (m-1 downto 0) of STD_LOGIC_VECTOR (n-1 downto 0);
-	signal mem : mem_temp;
+	signal mem : mem_temp := (
+         0 => x"8C280000",
+	    1 => x"20010005",
+	    2 => x"12345678",
+	    3 => x"2008000A",
+	    4 => x"AC020888",
+	    5 => x"20080001",
+	    others => x"00000000"
+    );
   
 begin
 
 	MEM_PROC:
-		process(reset,memWrite,memRead,write_data,MEM,addr)
+		process(memWrite,memRead,write_data,MEM,addr)
 		begin	
 			if (reset = '1') then
 				for i in 0 to m-1 loop

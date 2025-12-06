@@ -26,6 +26,8 @@ architecture rtl of CTRL is
     signal lw     : std_logic := '0';
     signal sw     : std_logic := '0';
     signal beq    : std_logic := '0';
+	signal addi : std_logic := '0';
+    signal andi     : std_logic := '0';
 	
 begin	
 
@@ -41,14 +43,20 @@ begin
 	beq		<=	not OP(5) and not OP(4) and not OP(3) and 
 				    OP(2) and not OP(1) and not OP(0);
 	
-	RegWrite	<= r_type or lw;		
+	andi 	<= not OP(5) and not OP(4) and  OP(3) and 
+	OP(2) and not OP(1) and not OP(0);
+	
+	addi 	<= not OP(5) and not OP(4) and  OP(3) and 
+	not OP(2) and not OP(1) and not OP(0);
+	
+	RegWrite	<= r_type or lw or addi or andi;		
 	MemtoReg	<= lw;		
 	Branch		<= beq;	
 	MemRead		<= lw;
 	MemWrite	<= sw;
 	RegDst		<= r_type;
-	ALUSrc		<= lw or sw;
-	ALUOp0		<= beq;
-	ALUOp1		<= r_type;
+	ALUSrc		<= lw or sw or addi or andi;
+	ALUOp0		<= beq or andi;
+	ALUOp1		<= r_type or andi;
 			
 end rtl;

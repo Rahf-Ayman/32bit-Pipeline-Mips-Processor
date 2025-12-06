@@ -75,7 +75,6 @@ begin
 	Data_Memory:
 		Data_Mem generic map (n=>INST_SIZE, m=>NUM_ADDR)
 	 	port map(
-			reset		=> reset,
 			addr		=> addr_in,
 			write_data	=> write_data,
 			memRead		=> mem.MemRead,

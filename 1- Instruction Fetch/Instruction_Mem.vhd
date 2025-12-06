@@ -13,9 +13,13 @@ architecture Behavioral of InstrMemory is
 
     type mem_type is array(0 to 255) of std_logic_vector(31 downto 0);
     signal MEM : mem_type := (
-        0 => x"01402020",
-        1 => x"00000022",
-        others => x"00000000"
+         0 => x"FFFFFFFF",
+	    1 => x"20010005", -- addi $1, $0 ,5
+	    2 => x"11090002", -- beq $t0, $t1, 2
+	    3 => x"00000000",
+	    4 => x"AC020008", -- used by beq $t0, $t1, 2
+	    5 => x"8C280000", -- lw $t0, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0
+	    others => x"00000000"
     );
 
 begin
