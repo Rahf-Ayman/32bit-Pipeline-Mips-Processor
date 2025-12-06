@@ -7,7 +7,7 @@ library work;
 use work.MIPS_CONST_PKG.all; 
 
 entity Data_Mem is
-	generic (n :NATURAL; m :NATURAL);
+	generic (n :integer; m :integer);
 	port(			
 		addr		:	in  STD_LOGIC_VECTOR (n-1 downto 0);
 		write_data	:	in  STD_LOGIC_VECTOR (n-1 downto 0);
@@ -19,26 +19,35 @@ end Data_Mem;
 
 architecture Data_Mem_arc of Data_Mem is
   
-	type mem_temp is array (m-1 downto 0) of STD_LOGIC_VECTOR (n-1 downto 0);
+	type mem_temp is array (m-1 downto 0) of STD_LOGIC_VECTOR (7 downto 0);
 	signal mem : mem_temp := (
-         0 => x"8C280000",
-	    1 => x"20010005",
-	    2 => x"12345678",
-	    3 => x"2008000A",
-	    4 => x"AC020888",
-	    5 => x"20080001",
-	    others => x"00000000"
+         0 => x"8C", 1 => x"28", 2 => x"00", 3 => x"00",  -- 0x8C280000
+	    4 => x"20", 5 => x"01", 6 => x"00", 7 => x"05",  -- 0x20010005
+	    8 => x"12", 9 => x"34", 10 => x"56", 11 => x"78", -- 0x12345678
+	    12 => x"20", 13 => x"08", 14 => x"00", 15 => x"0A", -- 0x2008000A
+	    16 => x"AC", 17 => x"02", 18 => x"08", 19 => x"88", -- 0xAC020888
+	    20 => x"20", 21 => x"08", 22 => x"00", 23 => x"01", -- 0x20080001
+	    others => x"00"
     );
   
 begin
 
 	MEM_PROC:
 		process(memWrite,memRead,write_data,MEM,addr)
-		begin	
+		variable base_addr : integer range 0 to m-1;
+		begin
+		base_addr := to_integer(unsigned(addr));	
 			if memWrite='1' then 
-				mem(to_integer(unsigned( addr(9 downto 0) ))) <= write_data;   -- mem with size 1024 so take 9 down to 0
+				mem(base_addr)     <= write_data(31 downto 24); 
+                mem(base_addr + 1) <= write_data(23 downto 16); 
+                mem(base_addr + 2) <= write_data(15 downto  8); 
+                mem(base_addr + 3) <= write_data( 7 downto  0); 
 			elsif memRead='1' then
-			    	read_data <= mem(to_integer(unsigned( addr(9 downto 0) )));
+			    	read_data <= 
+                        mem(base_addr) &
+                        mem(base_addr + 1) &
+                        mem(base_addr + 2) &
+                        mem(base_addr + 3);
 			end if;
 		end process MEM_PROC;
 
