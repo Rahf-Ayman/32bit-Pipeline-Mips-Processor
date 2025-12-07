@@ -51,14 +51,10 @@ architecture struct of Instruction_Decode is
 	component CTRL is
 	port( 
 		OP			: in	STD_LOGIC_VECTOR (5 downto 0);
-		RegWrite		: out	STD_LOGIC; 	
-		MemtoReg		: out	STD_LOGIC;  	
-		Branch			: out	STD_LOGIC; 
-		MemRead			: out	STD_LOGIC; 
-		MemWrite		: out	STD_LOGIC; 
-		RegDst			: out	STD_LOGIC;
-		ALUSrc			: out	STD_LOGIC;
-		ALUOp    		: out	ALU_OP_INPUT
+	
+		EX_signals : out EX_CTRL_REG;
+		M_signals  : out MEM_CTRL_REG;
+		WB_signals : out WB_CTRL_REG
 	);
 	end component CTRL;
 	
@@ -124,14 +120,9 @@ begin
 	CU:
 	CTRL port map(
 		OP	=> instruction(INST_SIZE-1 downto 26),
-		RegWrite => WB_intern.RegWrite, 	
-		MemtoReg => WB_intern.MemtoReg,  	
-		Branch	=> M_intern.Branch, 
-		MemRead	=> M_intern.MemRead, 
-		MemWrite => M_intern.MemWrite, 
-		RegDst	=> EX_intern.RegDst,
-		ALUSrc	=> EX_intern.ALUSrc,
-		ALUOp	=> EX_intern.ALUOp
+		WB_signals => WB_intern, 	 	
+		M_signals	=> M_intern, 
+		EX_signals	=> EX_intern
 	);
 	
 	ID_EX:
