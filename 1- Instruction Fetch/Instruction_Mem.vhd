@@ -15,10 +15,17 @@ architecture Behavioral of InstrMemory is
     signal MEM : mem_type := (
          0 => x"FFFFFFFF",
 	    1 => x"20010005", -- addi $1, $0 ,5
-	    2 => x"11090002", -- beq $t0, $t1, 2
+	    2 => x"00000000", -- beq $t0, $t1, 2 11090004
 	    3 => x"00000000",
 	    4 => x"AC020008", -- used by beq $t0, $t1, 2
 	    5 => x"8C280000", -- lw $t0, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0
+		6 => x"AC010018", -- sw $1, 24($0)
+		7 => x"11090004", -- beq $t0, $t1, 4 at add 28 branched to 28 + 4 + 4 * 4
+		8 => x"EEEEEEE4",
+		9 => x"EEEEEEE3",
+		10 => x"EEEEEEE2",
+		11 => x"EEEEEEE1",
+		12 => x"EEEEEEEE", -- at 48	address x"30"
 	    others => x"00000000"
     );
 

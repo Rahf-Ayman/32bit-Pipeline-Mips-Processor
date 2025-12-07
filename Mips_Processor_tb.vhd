@@ -17,7 +17,8 @@ architecture behavior of Mips_Processor_TB is
 			RESET	 :	in STD_LOGIC;
 			
 			INSTR   : out STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
-			WRITE_DATA : out STD_LOGIC_VECTOR(INST_SIZE-1 downto 0)
+			WRITE_DATA : out STD_LOGIC_VECTOR (INST_SIZE-1 downto 0);
+			WRITE_DATA_MEM : out STD_LOGIC_VECTOR (INST_SIZE-1 downto 0)
 		);
 	end component Mips_Processor;
 	
@@ -28,7 +29,7 @@ architecture behavior of Mips_Processor_TB is
 	
 	signal INSTR   : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 	signal WRITE_DATA :  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
-	
+	signal WRITE_DATA_MEM :  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 	constant CLK_PERIOD : time := 200 ns;
 
 begin
@@ -38,7 +39,8 @@ begin
 			RESET => RESET,
 			
 			INSTR => INSTR,
-			WRITE_DATA => WRITE_DATA
+			WRITE_DATA => WRITE_DATA,
+			WRITE_DATA_MEM => WRITE_DATA_MEM
 		);
 
 	CLK_PROCESS : process
@@ -68,13 +70,13 @@ begin
 		
 		wait for 150ns;
 		
-        -- Check instruction at cycle 4
-        if cycle_count = 5 then -- check beq $t0, $t1, 2
-			-- start at cycle 2 end at 5
-            if INSTR = x"AC020008" then
-                report "Instruction check passed beq $t0, $t1, 2 at index 2 at cycle 5!" severity note;
+        -- Check instructions
+        if cycle_count = 12 then -- check beq $t0, $t1, 4
+			-- start at cycle 7 end at 10 next fitch at clk 12 (pass 2 reg)
+            if INSTR = x"EEEEEEEE" then	-- INSTR at decode stage
+                report "Instruction check passed beq $t0, $t1, 2 at index 7 at cycle 5!" severity note;
             else
-                report "Instruction check failed beq $t0, $t1, 2 at index 2 passed at cycle 5!" severity warning;
+                report "Instruction check failed beq $t0, $t1, 2 at index 7 at cycle 5!" severity warning;
             end if;
         end if;
 
@@ -89,11 +91,20 @@ begin
         end if;
 		
 		if cycle_count = 9 then
-		    if WRITE_DATA = x"20080001" then  -- check lw expected value at memory[5]
+		    if WRITE_DATA = x"01000512" then  -- check lw expected value at memory[5]
 				-- start at cycle 5 end at 9
-		        report "LW check passed lw $t0, 0($1) at index 5 at cycle 10!" severity note;
+		        report "LW check passed lw $t0, 0($1) at index 5 at cycle 9!" severity note;
 		    else
-		        report "LW check failed lw $t0, 0($1) at index 5 at cycle 10!" severity error;
+		        report "LW check failed lw $t0, 0($1) at index 5 at cycle 9!" severity warning;
+		    end if;
+		end if;
+		
+		if cycle_count = 9 then
+		    if WRITE_DATA_MEM = x"00000005" then  -- check sw expected value at memory[24] <- $1
+				-- start at cycle 6 end at 9
+		        report "sw check passed sw $1, 24($0) at index 6 at cycle 10!" severity note;
+		    else
+		        report "sw check failed sw $1, 24($0) at index 6 at cycle 10!" severity warning;
 		    end if;
 		end if;
     end loop;
