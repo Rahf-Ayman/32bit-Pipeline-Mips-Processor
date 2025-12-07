@@ -30,7 +30,7 @@ architecture behavior of Mips_Processor_TB is
 	signal INSTR   : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 	signal WRITE_DATA :  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
 	signal WRITE_DATA_MEM :  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
-	constant CLK_PERIOD : time := 200 ns;
+	constant CLK_PERIOD : time := 200 ns; --350 ps (MEM) + 120 ps (reg) + 50 ps (mux) = 520ps (real timing)
 
 begin
 	DUT:
@@ -55,7 +55,7 @@ begin
 		process
 		begin
 			RESET<='1';
-			wait for 50 ns;
+			wait for CLK_PERIOD/4;
 			RESET<='0';
 			wait;
 		end process RESET_PROC;
@@ -68,7 +68,7 @@ begin
         wait until rising_edge(CLK);
         cycle_count := cycle_count + 1;
 		
-		wait for 150ns;
+		wait for 3*CLK_PERIOD/4;
 		
         -- Check instructions
         if cycle_count = 12 then -- check beq $t0, $t1, 4
@@ -102,9 +102,9 @@ begin
 		if cycle_count = 9 then
 		    if WRITE_DATA_MEM = x"00000005" then  -- check sw expected value at memory[24] <- $1
 				-- start at cycle 6 end at 9
-		        report "sw check passed sw $1, 24($0) at index 6 at cycle 10!" severity note;
+		        report "sw check passed sw $1, 24($0) at index 6 at cycle 9!" severity note;
 		    else
-		        report "sw check failed sw $1, 24($0) at index 6 at cycle 10!" severity warning;
+		        report "sw check failed sw $1, 24($0) at index 6 at cycle 9!" severity warning;
 		    end if;
 		end if;
     end loop;
