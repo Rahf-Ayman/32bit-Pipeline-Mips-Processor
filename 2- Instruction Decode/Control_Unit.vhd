@@ -2,7 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-
+library work;
+use work.MIPS_CONST_PKG.all;
 entity CTRL is
 	port( 
 		OP			: in	STD_LOGIC_VECTOR (5 downto 0);
@@ -14,8 +15,7 @@ entity CTRL is
 		MemWrite		: out	STD_LOGIC; 
 		RegDst			: out	STD_LOGIC;
 		ALUSrc			: out	STD_LOGIC;
-		ALUOp0			: out	STD_LOGIC;
-		ALUOp1			: out	STD_LOGIC
+		ALUOp    		: out	ALU_OP_INPUT
 	);
 end CTRL;
 
@@ -56,7 +56,6 @@ begin
 	MemWrite	<= sw;
 	RegDst		<= r_type;
 	ALUSrc		<= lw or sw or addi or andi;
-	ALUOp0		<= beq or andi;
-	ALUOp1		<= r_type or andi;
-			
+	ALUOp.Op0   <= beq or andi;
+    ALUOp.OP1   <= r_type or andi;
 end rtl;

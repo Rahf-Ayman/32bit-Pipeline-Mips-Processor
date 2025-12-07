@@ -90,6 +90,12 @@ architecture Execution_ARC of Execution is
 		selector:in std_logic;
 		output:out std_logic_vector(n-1 downto 0));
 	end component Mux2to1;
+	component ShiftLeft2 is
+	port(
+	i:in std_logic_vector(29 downto 0);
+	o:out  std_logic_vector(31 downto 0)
+	); 
+	end component ShiftLeft2;
 	
 	signal CARRY_EX	: STD_LOGIC;
 	signal ALU_IN_EX	: ALU_INPUT;
@@ -101,7 +107,6 @@ architecture Execution_ARC of Execution is
 	signal ALU_FLAGS_EX	: ALU_FLAGS;
 	 
 begin
-	OFFSET_SHIFT2 <= OFFSET(29 downto 0) & "00";
 
 	ALU_CTR:
 		ALU_Control port map(
@@ -127,6 +132,11 @@ begin
 		in1 => RD_ADDR,
 		selector => EX_CR.RegDst,
 		output => RT_RD_ADDR_EX
+	   );	
+	shift2:
+	   ShiftLeft2 port map(	   
+	    i => OFFSET(29 downto 0),
+	    o =>OFFSET_SHIFT2
 	   );	
 	MUX_ALU:
 	Mux2to1 generic map (n=>INST_SIZE)

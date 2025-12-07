@@ -58,8 +58,7 @@ architecture struct of Instruction_Decode is
 		MemWrite		: out	STD_LOGIC; 
 		RegDst			: out	STD_LOGIC;
 		ALUSrc			: out	STD_LOGIC;
-		ALUOp0			: out	STD_LOGIC;
-		ALUOp1			: out	STD_LOGIC
+		ALUOp    		: out	ALU_OP_INPUT
 	);
 	end component CTRL;
 	
@@ -132,8 +131,7 @@ begin
 		MemWrite => M_intern.MemWrite, 
 		RegDst	=> EX_intern.RegDst,
 		ALUSrc	=> EX_intern.ALUSrc,
-		ALUOp0	=> EX_intern.ALUOp.Op0,
-		ALUOp1	=> EX_intern.ALUOp.Op1
+		ALUOp	=> EX_intern.ALUOp
 	);
 	
 	ID_EX:
