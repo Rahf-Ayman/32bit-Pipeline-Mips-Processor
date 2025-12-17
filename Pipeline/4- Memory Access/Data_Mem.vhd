@@ -35,7 +35,7 @@ begin
     READ_PROC: process(memRead, mem, addr)
         variable base_addr : integer range 0 to m-1;
     begin
-        base_addr := to_integer(unsigned(addr));
+         base_addr := to_integer(unsigned(addr(9 downto 0))); 
         
         if memRead='1' then
             if base_addr <= m-4 then
@@ -56,7 +56,7 @@ begin
         variable base_addr : integer range 0 to m-1;
     begin
         if rising_edge(clk) then
-            base_addr := to_integer(unsigned(addr));
+             base_addr := to_integer(unsigned(addr(9 downto 0))); 
             
             if memWrite='1' then
                 if base_addr <= m-4 then
