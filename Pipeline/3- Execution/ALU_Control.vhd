@@ -81,10 +81,10 @@ begin
                         ALU_IN.Op0 <= '1';
                         
                     when "101010" =>  -- SLT
-                        ALU_IN.Op3 <= '1';
+                        ALU_IN.Op3 <= '0';
                         ALU_IN.Op2 <= '1';
                         ALU_IN.Op1 <= '1';
-                        ALU_IN.Op0 <= '0';
+                        ALU_IN.Op0 <= '1';
                         
                     when "000000" =>  -- SLL 
                         ALU_IN.Op3 <= '1';  -- Op3=1
