@@ -15,9 +15,9 @@ architecture Behavioral of InstrMemory is
     signal MEM : mem_type := (
          0 => x"FFFFFFFF",
 	    1 => x"20010005", -- addi $1, $0 ,5
-	    2 => x"00000000", -- beq $t0, $t1, 2 11090004
+	    2 => x"00000000", 
 	    3 => x"00000000",
-	    4 => x"AC020008", -- used by beq $t0, $t1, 2
+	    4 => x"AC020009", -- used by beq $t0, $t1, 2 (sw $2, 8($0))
 	    5 => x"8C280000", -- lw $t0, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0
 		6 => x"AC010018", -- sw $1, 24($0)
 		7 => x"11090004", -- beq $t0, $t1, 4 at add 28 branched to 28 + 4 + 4 * 4

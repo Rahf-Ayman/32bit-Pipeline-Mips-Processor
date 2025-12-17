@@ -14,19 +14,14 @@ entity ALU_Control is
 end ALU_Control;
 
 architecture ALU_Con_Arc of ALU_Control is 
-signal op_code : std_logic_vector(1 downto 0);
+
 begin	  
-	op_code <= ALUOP.Op1 & ALUOP.Op0;
-    process(ALUOP, Fun)	
-	
+    process(ALUOP.Op1,ALUOP.Op0, Fun)	
+	   variable op_code_var : std_logic_vector(1 downto 0);
     begin
-        -- Default values and
-        ALU_IN.Op3 <= '0';
-        ALU_IN.Op2 <= '0';
-        ALU_IN.Op1 <= '0';
-        ALU_IN.Op0 <= '0';
-        						
-     case op_code is
+        
+		op_code_var := 	ALUOP.Op1 & ALUOP.Op0;
+     case op_code_var is
             when "00" =>  -- lw, sw, addi
                 -- ADD operation: 0010
                 ALU_IN.Op3 <= '0';
