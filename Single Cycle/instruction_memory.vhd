@@ -19,7 +19,7 @@ architecture Behavioral of InstrMemory is
          0 => x"FFFFFFFF",
 	    1 => x"20010005", -- addi $1, $0 ,5
 	    2 => x"00000000",  
-	    3 => x"8C290000", -- lw $t0, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0  Reg[8] = 01000512
+	    3 => x"8C290000", -- lw $t1, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0  Reg[8] = 01000512
 	    4 => x"AC020009", -- used by beq $t0, $t1, 2
 	    5 => x"8C280000", -- lw $t0, 0($1)  $t3 reg 1 mem[$1 = 5] -> $t0  Reg[8] = 01000512
 		6 => x"AC010018", -- sw $1, 24($0)
