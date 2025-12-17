@@ -33,7 +33,7 @@ architecture Data_Mem_arc of Data_Mem is
 begin
 
 	MEM_PROC:
-		process(memWrite,memRead,write_data,MEM,addr)
+		process(memWrite,memRead,write_data,mem,addr)
 		variable base_addr : integer range 0 to m-1;
 		begin
 		base_addr := to_integer(unsigned(addr));	
