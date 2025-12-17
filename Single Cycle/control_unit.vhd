@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-entity ControlUnit is
+entity control_unit is
     Port ( OP : in  STD_LOGIC_VECTOR (5 downto 0);
 	   RegDst : out  STD_LOGIC;
 	   Branch : out  STD_LOGIC;
@@ -12,9 +12,9 @@ entity ControlUnit is
        RegWrite : out  STD_LOGIC;
        ALUOP : out  STD_LOGIC_VECTOR (1 downto 0)
 	   );
-end ControlUnit;
+end control_unit;
 
-architecture Behavioral of ControlUnit is
+architecture Behavioral of control_unit is
     signal r_type : std_logic := '0';
     signal lw     : std_logic := '0';
     signal sw     : std_logic := '0';
@@ -24,32 +24,33 @@ architecture Behavioral of ControlUnit is
 	
 begin	
 
-	r_type		<=	not OP(5) and not OP(4) and not OP(3) and 
+	r_type	<=	not OP(5) and not OP(4) and not OP(3) and 
 				not OP(2) and not OP(1) and not OP(0);
 		
-	lw		<=	OP(5) and not OP(4) and not OP(3) and 
-				not OP(2) and    OP(1) and     OP(0);
+	lw	<=	OP(5) and not OP(4) and not OP(3) and 
+			not OP(2) and    OP(1) and     OP(0);
 		
-	sw		<=	OP(5) and not OP(4) and 	OP(3) and 
-				not OP(2) and     OP(1) and     OP(0);
+	sw	<=	OP(5) and not OP(4) and 	OP(3) and 
+			not OP(2) and     OP(1) and     OP(0);
 
-	beq		<=	not OP(5) and not OP(4) and not OP(3) and 
-				    OP(2) and not OP(1) and not OP(0);
+	beq	<=	not OP(5) and not OP(4) and not OP(3) and 
+		    OP(2) and not OP(1) and not OP(0);
 	
-	andi 	<= not OP(5) and not OP(4) and  OP(3) and 
-	OP(2) and not OP(1) and not OP(0);
+	andi <= not OP(5) and not OP(4) and  OP(3) and 
+	        OP(2) and not OP(1) and not OP(0);
 	
-	addi 	<= not OP(5) and not OP(4) and  OP(3) and 
-	not OP(2) and not OP(1) and not OP(0);
+	addi <= not OP(5) and not OP(4) and  OP(3) and 
+	        not OP(2) and not OP(1) and not OP(0);
 	
-	RegWrite	<= r_type or lw or addi or andi;		
-	MemtoReg	<= lw;		
-	Branch <= beq;	
-	MemRead <= lw;
-	MemWrite	<= sw;
-	RegDst		<= r_type;
-	ALUSrc		<= lw or sw or addi or andi;
-	ALUOp(0)	<= beq or andi;
-	ALUOp(1)	<= r_type or andi;
+	RegWrite <= r_type or lw or addi or andi;		
+	MemtoReg <= lw;		
+	Branch   <= beq;	
+	MemRead  <= lw;
+	MemWrite <= sw;
+	RegDst	 <= r_type;
+	ALUSrc	 <= lw or sw or addi or andi;
+	ALUOp(0) <= beq or andi;
+	ALUOp(1) <= r_type or andi;
     
-end Behavioral;
+end Behavioral;
+

@@ -5,7 +5,10 @@ use ieee.numeric_std.all;
 entity single_cycle_top is
     Port(
         clk : in STD_LOGIC;
-        reset : in STD_LOGIC
+        reset : in STD_LOGIC;
+		instr_out  : out STD_LOGIC_VECTOR(31 downto 0); 
+		WRITE_DATA_MEM :out STD_LOGIC_VECTOR(31 downto 0); 
+        write_out  : out STD_LOGIC_VECTOR(31 downto 0) 
     );
 end single_cycle_top;
 
@@ -13,13 +16,18 @@ end single_cycle_top;
 
 architecture Behavioral of single_cycle_top is	
 
--- #############################   components    #############################
-component ControlUnit
-	port(
-		OP : in  STD_LOGIC_VECTOR(5 downto 0);
-        RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out STD_LOGIC;   						 
-        ALUOp : out STD_LOGIC_VECTOR(1 downto 0)	
-	);
+-- #############################   COMPONENTS    #############################
+component control_unit
+	 Port ( OP : in  STD_LOGIC_VECTOR (5 downto 0);
+	   RegDst : out  STD_LOGIC;
+	   Branch : out  STD_LOGIC;
+	   MemRead : out STD_LOGIC;
+       MemtoReg : out  STD_LOGIC;
+       MemWrite : out  STD_LOGIC;
+       AluSrc : out  STD_LOGIC;
+       RegWrite : out  STD_LOGIC;
+       ALUOP : out  STD_LOGIC_VECTOR (1 downto 0)
+	   );
 end component;
 
 component sign_extend is
@@ -39,7 +47,7 @@ end component;
 
 component InstrMemory is
     port (
-        address          : in  std_logic_vector(31 downto 0);
+        address : in std_logic_vector(31 downto 0);
         Instruction : out std_logic_vector(31 downto 0)
     );
 end component;
@@ -99,31 +107,43 @@ component ALUControl is
 end component;
 
 
--- #######################    Signals    ###########################
+-- #######################    SIGNALS    ###########################
 
-signal pc_current, pc_next, pc_plus_4 : std_logic_vector(31 downto 0);
-signal instruction : std_logic_vector(31 downto 0);	-- instruction coming from instruction memory
+signal pc_current, pc_next, pc_plus4 : std_logic_vector(31 downto 0);
+signal instruction : std_logic_vector(31 downto 0);	-- instruction coming from instruction memory 
+
 signal reg_read1, reg_read2 : std_logic_vector(31 downto 0); -- rs (instruction[25:21]) ? rt (instruction[20:16])
-signal write_back_data : std_logic_vector(31 downto 0); -- data written back into register file (ALU result or memory data)
+signal write_data : std_logic_vector(31 downto 0); -- data written back into register file (ALU result or memory data)
+
 signal extend_out : std_logic_vector(31 downto 0); -- sign-extended immediate (from instruction[15:0])
-signal shifted_out : std_logic_vector(31 downto 0); --used for branch target address
+signal shifted_out : std_logic_vector(31 downto 0); --used for branch target address 
+
+
 signal alu_src_out : std_logic_vector(31 downto 0);-- second ALU operand after ALUSrc mux 
 signal alu_result : std_logic_vector(31 downto 0);-- result produced by the ALU
 signal zero_flag : std_logic;  -- ALU zero flag
+
 signal mem_read_data : std_logic_vector(31 downto 0);-- data read from Data Memory during LW
-signal RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : std_logic;-- control unit signals
+
+signal RegDst, ALUSrc, MemtoReg, RegWrite: std_logic;-- control unit signals
+signal MemRead, MemWrite, Branch : std_logic;
+
 signal ALUOp  : std_logic_vector(1 downto 0); --telling ALU Control which operation group
 signal ALUCtr : std_logic_vector(3 downto 0);  --ALU control lines (AND,OR,ADD,SUB .....)
-signal write_reg : std_logic_vector(4 downto 0); -- selected register number to write in register file
+
 signal branch_target : std_logic_vector(31 downto 0); -- PC+4 + (immediate<<2)
-signal branch_mux_out : std_logic_vector(31 downto 0);-- output of branch mux
 signal branch_and_zero : std_logic;	-- becomes 1 only when we have a BEQ instruction and the ALU result is zero (rs == rt)
+
 signal write_reg_rt : std_logic_vector(31 downto 0);-- instruction[20:16]
 signal write_reg_rd : std_logic_vector(31 downto 0);-- instruction[15:11]
+signal write_reg : std_logic_vector(4 downto 0); -- selected register number to write in register file
+signal regdst_mux_out : STD_LOGIC_VECTOR(31 downto 0);
 
 -- #############################   CONNECTIONS    #############################
 
 begin
+
+
 -- PC
 PC_Main: pc
     port map(
@@ -145,23 +165,23 @@ ADD_PC: adder
     port map(
         adder_in1 => pc_current,
         adder_in2 => x"00000004",
-        adder_out => pc_plus_4
+        adder_out => pc_plus4
     );
 
 -- Control Unit
-CTRL: ControlUnit
+CTRL: control_unit
     port map(
-        OP    => instruction(31 downto 26),
+        OP        => instruction(31 downto 26),
         RegDst    => RegDst,
-        ALUSrc    => ALUSrc,
+        AluSrc    => ALUSrc,
         MemtoReg  => MemtoReg,
         RegWrite  => RegWrite,
         MemRead   => MemRead,
         MemWrite  => MemWrite,
         Branch    => Branch,
-        ALUOp     => ALUOp
+        ALUOP     => ALUOp
     );
-
+	
 write_reg_rt <= (31 downto 5 => '0') & instruction(20 downto 16);
 write_reg_rd <= (31 downto 5 => '0') & instruction(15 downto 11);
 
@@ -171,11 +191,10 @@ RegDst_MUX: Mux
         mux_in1 => write_reg_rt,
 	    mux_in2 => write_reg_rd,
         mux_select => RegDst,
-        mux_out    => open -- 32-bit, we need only 5 bits, fix below
+        mux_out    => regdst_mux_out
     );
 
--- Correct 5-bit write register selection
-write_reg <= instruction(20 downto 16) when RegDst = '0' else instruction(15 downto 11);
+write_reg <= regdst_mux_out(4 downto 0);
 
 -- Register File
 RF: register_file
@@ -186,7 +205,7 @@ RF: register_file
         read_reg1  => instruction(25 downto 21),
         read_reg2  => instruction(20 downto 16),
         write_reg  => write_reg,
-        write_data => write_back_data,
+        write_data => write_data,
         read_data1 => reg_read1,
         read_data2 => reg_read2
     );
@@ -242,7 +261,7 @@ WB_MUX: Mux
         mux_in1    => alu_result,
         mux_in2    => mem_read_data,
         mux_select => MemtoReg,
-        mux_out    => write_back_data
+        mux_out    => write_data
     );
 
 -- Shift-left-2 of immediate
@@ -255,7 +274,7 @@ SHL: ShiftLeft2
 -- Branch Address = PC + 4 + shifted immediate
 ADD_BRANCH: adder
     port map(
-        adder_in1 => pc_plus_4,
+        adder_in1 => pc_plus4,
         adder_in2 => shifted_out,
         adder_out => branch_target
     );
@@ -266,10 +285,14 @@ branch_and_zero <= Branch AND zero_flag;
 -- PC Mux (branch or sequential)
 PC_MUX: Mux
     port map(
-        mux_in1    => pc_plus_4,
+        mux_in1    => pc_plus4,
         mux_in2    => branch_target,
         mux_select => branch_and_zero,
         mux_out    => pc_next
-    );
+    ); 
+	
+instr_out <= instruction;
+write_out <= write_data;
+WRITE_DATA_MEM  <= reg_read2;
 
 end Behavioral;

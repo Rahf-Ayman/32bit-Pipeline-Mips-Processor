@@ -13,12 +13,12 @@ entity pc is
 end pc;
 
 architecture Behavioral of pc is
-    signal pc_reg : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    
 begin
     process(clk, reset)
     begin
         if reset = '1' then
-            pc_reg <= (others => '0');
+            pc_out <= (others => '0');
         elsif rising_edge(clk) then
             pc_out <= pc_in;
         end if;
